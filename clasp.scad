@@ -1,53 +1,61 @@
-/*
-$fn = 10;
 
-cp_rad = 1.5;
+module clasp(length=20, 
+             pin_radius=5,
+             // All of these are defined below due to 
+             // SCAD language limits (no derived params)
+             mouth = undef,
+             inner_radius = undef,
+             outer_radius = undef
+             ) {            
+  mouth = is_undef(mouth) ? pin_radius * 1.75 : mouth;
+  inner_radius = is_undef(inner_radius) ? pin_radius + 0.25 : inner_radius;
+  outer_radius = is_undef(outer_radius) ? inner_radius * 1.4 : outer_radius;
 
-clasp_len =10;
-clasp_mouth = cp_rad * 0.9;
-
-clasp_inner_rad = cp_rad+0.25;
-clasp_outer_rad = clasp_inner_rad*1.4;
-*/
-
-module half_clasp() {
-  difference() {
-    cylinder(r=clasp_outer_rad,h=clasp_len);
-    // cube([clasp_rad, clasp_rad, clasp_len]);
-    translate([0,0,-1]) cylinder(r=clasp_inner_rad,h=clasp_len+2);
-    translate([-clasp_mouth/2,0,-1]) 
-      cube([clasp_mouth,clasp_outer_rad+2,clasp_len+2]);
-  }
-}
-
-module clasp() {
   echo(str("Building clasp with: "));
-  echo(str("  Length: ", clasp_len));
-  echo(str("  In Radius: ", clasp_inner_rad));
-  echo(str("  Out Radius: ", clasp_outer_rad));
-  echo(str("  Mouth : ", clasp_mouth));
-  echo(str("  PinRad: ", cp_rad)); 
-  union() {
-    translate([0, clasp_outer_rad-(clasp_outer_rad - clasp_inner_rad), 0]) 
-      half_clasp();
-    translate([0, -clasp_outer_rad, 0]) rotate(180) 
-      half_clasp();
-    //color("blue") 
-    //cylinder(r=1,h=10);
+  echo(str("  Length: ", length));
+  echo(str("  In Radius: ", inner_radius));
+  echo(str("  Out Radius: ", outer_radius));
+  echo(str("  Mouth : ", mouth));
+  echo(str("  PinRad: ", pin_radius));
+
+  difference() {
+    cylinder(r=outer_radius,h=length);
+   
+    translate([0,0,-1]) 
+      cylinder(r=inner_radius,h=length+2);
+        
+    cutout_mouth(mouth, inner_radius);
   }
+  
+  // Helper module
+  module cutout_mouth(mouth, radius) {
+    echo(str("Cutting mouth with: "));
+    echo(str("  Mouth: ", mouth));
+    echo(str("  InnerRad: ", radius));
+    angle_rad = mouth / radius; // circle central angle (rad)
+    angle_deg = angle_rad * 57.2958; // (degrees)
+    echo(str("  Angle: ", angle_deg));
+
+    size = length + 2;
+    if (angle_deg <= 90) {
+      translate([0,0,-1]) 
+      intersection() {
+        cube(size);
+        rotate(angle_deg-90) cube(size);
+      }
+    } else if (angle_deg <= 180) {
+      translate([0,0,-1]) 
+      union() {
+        cube(size);
+        rotate(angle_deg-90) cube(size);
+      }      
+    } else {
+      echo(str("FAILURE - Angle cannot exceed 180"));
+    } 
+  }
+
 }
 
-//clasp();
-
-/*
-Attempt to cut clasp from square
-difference() {
-  cube([clasp_rad, clasp_rad, clasp_len]);
-  // Cut out pin hole
-  translate([clasp_rad/2,clasp_rad/2,-1]) 
-    cylinder(r=cp_rad,h=clasp_len+2);
-  // Cut mouth
-  translate([-1, clasp_rad/2 - clasp_mouth/2,-1]) 
-    cube([2, clasp_mouth, clasp_len+2]);
-}
-*/
+// clasp(length = 10);
+// Need a sample pin?
+// color("blue") cylinder(r=5, h=12);
