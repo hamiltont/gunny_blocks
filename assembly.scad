@@ -60,6 +60,46 @@ module clasp_pin(length=cp_len) {
   }
 }
 
+module test() {
+  
+  // TODO continue here need to insert the clasps and then rotate/place
+  // them properly
+
+  difference() {
+    mesh(side_length = mesh_size, 
+      hole_diameter = mesh_hole_diameter,
+      height = mesh_height,
+      border = mesh_border, 
+      grid_spacing = mesh_grid_spacing / 10);
+    
+    // Cut off the 4 corners
+    color("red") {      
+      mv = mesh_size - mesh_border;
+      t = [ [-1,-1],
+            [mv,-1],
+            [-1,mv],
+            [mv,mv] ];
+      
+      for (xy = t) 
+        translate([xy[0],xy[1],-1])
+        cube([mesh_border+1,mesh_border+1,mesh_height+2]);      
+    }
+    
+    // Create male sides
+    cp_mount = 2; // Attaches CP to mesh border
+    cp_length = mesh_size - 2*mesh_border - 2*cp_mount;
+    
+    translate([mesh_border+cp_mount,0 , 0])
+      clasp_pin(cp_length);
+    
+    translate([0, mesh_size - mesh_border - cp_mount,0])
+      rotate([0, 0, 270])
+      clasp_pin(cp_length);
+  }
+}
+
+
+
 
 module mesh_with_clasp_pins() {
   difference() {
