@@ -1,3 +1,6 @@
+// clasp(length = 10);
+// Need a sample pin?
+// color("blue") cylinder(r=5, h=12);
 
 module clasp(length=20, 
              pin_radius=5,
@@ -56,6 +59,27 @@ module clasp(length=20,
 
 }
 
-// clasp(length = 10);
-// Need a sample pin?
-// color("blue") cylinder(r=5, h=12);
+/*
+THIS is not working right now. It's a good idea to combine these, but
+the sad truth is a large amount of the correct clasp pin design has to do 
+with how you combine it with the mesh border. So it's a bit hard to embed
+with the clasp.scad file after the fact
+module clasp_pin(length=cp_len,
+    radius=cp_rad) {
+      
+  difference() {
+    // We oversize the cube (in Y and Z) to prevent edge artifacts 
+    translate([0, -1, -1]) 
+      cube([length, 2+cp_box_depth, mesh_height+2]);
+
+    // You can rotate it to get a better print angle, but you 
+    //   will need 8xSupports while printing
+    //   which is tedious to clean
+    // rotate(a=45, v=[1,0,0])
+    translate([-1, cp_box_depth/2, mesh_height/2])
+      rotate([0, 90, 0]) 
+      cylinder(r=radius, h=length+2);
+  }
+}
+*/
+

@@ -7,17 +7,17 @@ $fn=10;
 mode = 1;
 
 // === Mesh Variables ============
-  side_length = 50;
-  height = 3;
-  hole_diameter = 10;
-  border = 6;
-  grid_spacing = 1;
+  mesh_size = 50;
+  mesh_height = 3;
+  mesh_hole_diameter = 10;
+  mesh_border = 6;
+  mesh_grid_spacing = 1;
 // === End =======================
 
 // === Clasp Pin Variables ============
-  cp_len = side_length / 4;
+  cp_len = mesh_size / 4;
   cp_rad = 1.5;
-  cp_box_depth = border*0.75;
+  cp_box_depth = mesh_border*0.75;
 // === End =======================
 
 // === Clasp Variables ============
@@ -27,33 +27,47 @@ mode = 1;
   clasp_outer_rad = clasp_inner_rad*1.4;
 // === End =======================
 
+
+if (mode == 1) {
+  mesh_with_clasp_pins();
+  clasp(length=clasp_len, 
+    pin_radius=cp_rad,
+    mouth=clasp_mouth,
+    inner_radius=clasp_inner_rad,
+    outer_radius=clasp_outer_rad);
+} else if (mode == 2) {
+     clasp();
+} else if (mode == 3) {
+  test();
+}
+
 include <mesh.scad>
 include <clasp.scad>
 
-module clasp_pin() {
+module clasp_pin(length=cp_len) {
   difference() {
-    // Make the cube bigger (in Z) to ensure no edge artifact 
-    translate([0, 0,-1]) 
-      cube([cp_len, 1+cp_box_depth, height+2]);
+    // We oversize the cube (in Y and Z) to prevent edge artifacts 
+    translate([0, -1, -1]) 
+      cube([length, 2+cp_box_depth, mesh_height+2]);
 
     // You can rotate it to get a better print angle, but you 
     //   will need 8xSupports while printing
     //   which is tedious to clean
     // rotate(a=45, v=[1,0,0])
-    translate([-1, cp_box_depth/2, height/2])
+    translate([-1, cp_box_depth/2, mesh_height/2])
       rotate([0, 90, 0]) 
-      cylinder(r=cp_rad, h=cp_len+2);
+      cylinder(r=cp_rad, h=length+2);
   }
 }
 
 
 module mesh_with_clasp_pins() {
   difference() {
-    mesh(side_length, 
-      height, 
-      hole_diameter, 
-      border, 
-      grid_spacing / 10);
+    mesh(side_length = side_length, 
+      hole_diameter = hole_diameter,
+      height = height,
+      border = border, 
+      grid_spacing = grid_spacing / 10);
 
     // Build and rotate all the clasp pins  
     translate([cp_len / 2, 0, 0]) 
@@ -95,24 +109,3 @@ module mesh_with_clasp_pins() {
      clasp_pin();
   }
 }
-
-
-
-echo(str("Clasp pins are ", cp_len, 
-  "mm long and ", cp_rad, "mm round")); 
-echo(str("Using ", cp_box_depth, " of the ", 
-  border, "mm border"));
-
-if (mode == 1) {
-  mesh_with_clasp_pins();
-  // clasp_pin();
-} else if (mode == 2) {
-     clasp();
-} else if (mode == 3) {
-      translate([0, cp_len / 2, 0]) 
-
-   translate([0,cp_len,0])
-   rotate([0,0,270])
-    clasp_pin(); 
-}
-
