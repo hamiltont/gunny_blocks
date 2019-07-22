@@ -44,108 +44,38 @@ if (mode == 1) {
 include <mesh.scad>
 include <clasp.scad>
 
-module clasp_pin(length=cp_len) {
-  difference() {
-    // We oversize the cube (in Y and Z) to prevent edge artifacts 
-    translate([0, -1, -1]) 
-      cube([length, 2+cp_box_depth, mesh_height+2]);
-
-    // You can rotate it to get a better print angle, but you 
-    //   will need 8xSupports while printing
-    //   which is tedious to clean
-    // rotate(a=45, v=[1,0,0])
-    translate([-1, cp_box_depth/2, mesh_height/2])
-      rotate([0, 90, 0]) 
-      cylinder(r=cp_rad, h=length+2);
-  }
-}
-
-module test() {
+module mesh_with_clasps_and_pins() {
   
-  // TODO continue here need to insert the clasps and then rotate/place
-  // them properly
-
-  difference() {
-    mesh(side_length = mesh_size, 
-      hole_diameter = mesh_hole_diameter,
-      height = mesh_height,
-      border = mesh_border, 
-      grid_spacing = mesh_grid_spacing / 10);
+  // Make mesh & slide to have room for connectors
+  translate([con_depth, con_depth, 0])
+  mesh(side_length = mesh_size, 
+        hole_diameter = mesh_hole_diameter,
+        height = mesh_height,
+        border = mesh_border, 
+        grid_spacing = mesh_grid_spacing / 10);
+  
+  // Create male sides
+  translate([con_depth, 0 , 0]) 
+    male_pin_and_mount();
+  translate([0, mesh_size + con_depth,0])
+    rotate([0, 0, 270])
+    male_pin_and_mount();
     
-    // Cut off the 4 corners
-    color("red") {      
-      mv = mesh_size - mesh_border;
-      t = [ [-1,-1],
-            [mv,-1],
-            [-1,mv],
-            [mv,mv] ];
-      
-      for (xy = t) 
-        translate([xy[0],xy[1],-1])
-        cube([mesh_border+1,mesh_border+1,mesh_height+2]);      
+
+
+  
+  // Helper function
+  module male_pin_and_mount() {
+    // color("green") cube([con_width, con_depth, con_height]);  
+    // Assume mounts are each 1mm wide
+    // Assume we want the CP 2.5mm deep
+    pin_mount_height = (mesh_height / 2) - cp_rad;
+    union() {
+      cube([1, con_depth, con_height]);
+      translate([0, 2.5, pin_mount_height])
+        clasp_pin(radius=cp_rad, length=cp_length);
+      translate([con_width-1, 0, 0]) 
+        cube([1, con_depth, con_height]);
     }
-    
-    // Create male sides
-    cp_mount = 2; // Attaches CP to mesh border
-    cp_length = mesh_size - 2*mesh_border - 2*cp_mount;
-    
-    translate([mesh_border+cp_mount,0 , 0])
-      clasp_pin(cp_length);
-    
-    translate([0, mesh_size - mesh_border - cp_mount,0])
-      rotate([0, 0, 270])
-      clasp_pin(cp_length);
-  }
-}
-
-
-
-
-module mesh_with_clasp_pins() {
-  difference() {
-    mesh(side_length = side_length, 
-      hole_diameter = hole_diameter,
-      height = height,
-      border = border, 
-      grid_spacing = grid_spacing / 10);
-
-    // Build and rotate all the clasp pins  
-    translate([cp_len / 2, 0, 0]) 
-      clasp_pin();
-    
-    translate([cp_len / 2 * 5, 0, 0]) 
-      clasp_pin();
-    
-    translate([cp_len / 2, side_length - cp_box_depth, 0])
-      // Spin it around (and re-align) 
-      translate([cp_len, cp_box_depth, 0])
-      rotate([0,0,180])
-      clasp_pin();
-    
-    translate([cp_len / 2 * 5, side_length - cp_box_depth, 0]) 
-      // Spin it around (and re-align) 
-      translate([cp_len, cp_box_depth, 0])
-      rotate([0,0,180])
-      clasp_pin();
-      
-    translate([side_length, cp_len / 2, 0]) 
-      rotate([0,0,90])
-      clasp_pin();
-      
-    translate([side_length, cp_len / 2 * 5, 0]) 
-      rotate([0,0,90])
-      clasp_pin();
-      
-    translate([0, cp_len / 2, 0]) 
-     // Spin and re-align
-     translate([0,cp_len,0])
-     rotate([0,0,270])
-     clasp_pin();
-
-    translate([0, cp_len / 2*5, 0]) 
-     // Spin and re-align
-     translate([0,cp_len,0])
-     rotate([0,0,270])
-     clasp_pin();
   }
 }
