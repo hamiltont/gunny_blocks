@@ -29,16 +29,16 @@ if (mode == 1) {
 // === End =======================
 
 // === Clasp Pin Variables ============
-  cp_len = mesh_size / 4;
-  cp_rad = 1.5;
-  cp_box_depth = mesh_border*0.75;
+  cp_length = con_width;
+  cp_rad = 1;
+  // TODO define cp_mount_width = 1;
 // === End =======================
 
 // === Clasp Variables ============
-  clasp_len = cp_len * 0.85;
-  clasp_mouth = cp_rad*1.2;
-  clasp_inner_rad = cp_rad+0.25;
-  clasp_outer_rad = clasp_inner_rad*1.4;
+  clasp_len = con_width - 3;
+  clasp_mouth = cp_rad * 2.2;
+  clasp_inner_rad = cp_rad + 0.15;
+  clasp_outer_rad = clasp_inner_rad * 1.4; // 2.45; //clasp_inner_rad*1.4;
 // === End =======================
 
 include <mesh.scad>
