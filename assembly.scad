@@ -61,7 +61,34 @@ module mesh_with_clasps_and_pins() {
     rotate([0, 0, 270])
     male_pin_and_mount();
     
+  // Create female sides
+  translate([con_depth, mesh_size + con_depth, 0])
+    female_clasp_and_mount();
+  translate([mesh_size + con_depth, mesh_size + con_depth,0])
+    rotate([0, 0, -90])
+    female_clasp_and_mount();
 
+  module female_clasp_and_mount() {
+    // Helper variables
+    clasp_thickness = clasp_outer_rad - clasp_inner_rad;
+    clasp_mount_depth = con_depth - clasp_outer_rad*2; // Does not incl. thickness
+
+    // Assume we need to reserve 3mm (total) in X-axis the clasp mounts
+    // Realign Y-axix to zero 
+    translate([1.5, clasp_outer_rad + clasp_mount_depth,0])
+    union() {
+      // Shift clasp down to ease alignment
+      translate([0,0,(mesh_height / 2) - clasp_outer_rad]) 
+        clasp(length = clasp_len, 
+              pin_radius = cp_rad,
+              mouth = clasp_mouth,
+              inner_radius = clasp_inner_rad,
+              outer_radius=clasp_outer_rad);
+      // Build + align clasp mount
+      translate([0, -clasp_outer_rad-clasp_mount_depth, 0])
+        cube([con_width - 3, clasp_mount_depth + clasp_thickness, con_height]);
+     }
+ }
 
   
   // Helper function
