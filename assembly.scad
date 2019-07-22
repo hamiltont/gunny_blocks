@@ -20,6 +20,14 @@ if (mode == 1) {
   mesh_grid_spacing = 1;
 // === End =======================
 
+// === Connector Variables ============
+// These define the bounding box used by both
+// the clasp pin and the clasp
+  con_width = mesh_size;
+  con_height = mesh_height;
+  con_depth = 5;
+// === End =======================
+
 // === Clasp Pin Variables ============
   cp_len = mesh_size / 4;
   cp_rad = 1.5;
