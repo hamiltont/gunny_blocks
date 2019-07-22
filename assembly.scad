@@ -2,9 +2,15 @@
 $fn=10; 
 
 // Overall mode
-// 1 - Generate side (mesh with clasp-pins)
-// 2 - Generate clasp
+// 1 - Generate one side (mesh with clasps & pins)
+// 2 - Testing code
 mode = 1;
+
+if (mode == 1) {
+  mesh_with_clasps_and_pins();
+} else if (mode == 2) {
+  test();
+}
 
 // === Mesh Variables ============
   mesh_size = 50;
@@ -26,20 +32,6 @@ mode = 1;
   clasp_inner_rad = cp_rad+0.25;
   clasp_outer_rad = clasp_inner_rad*1.4;
 // === End =======================
-
-
-if (mode == 1) {
-  mesh_with_clasp_pins();
-  clasp(length=clasp_len, 
-    pin_radius=cp_rad,
-    mouth=clasp_mouth,
-    inner_radius=clasp_inner_rad,
-    outer_radius=clasp_outer_rad);
-} else if (mode == 2) {
-     clasp();
-} else if (mode == 3) {
-  test();
-}
 
 include <mesh.scad>
 include <clasp.scad>
