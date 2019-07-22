@@ -57,16 +57,16 @@ module mesh_with_clasps_and_pins() {
         grid_spacing = mesh_grid_spacing / 10);
   
   // Create male sides
-  translate([con_depth, 0 , 0]) 
+  color("red") translate([con_depth, 0 , 0]) 
     male_pin_and_mount();
-  translate([0, mesh_size + con_depth,0])
+  color("red") translate([0, mesh_size + con_depth,0])
     rotate([0, 0, 270])
     male_pin_and_mount();
     
   // Create female sides
-  translate([con_depth, mesh_size + con_depth, 0])
+  color("green") translate([con_depth, mesh_size + con_depth, 0])
     female_clasp_and_mount();
-  translate([mesh_size + con_depth, mesh_size + con_depth,0])
+  color("green") translate([mesh_size + con_depth, mesh_size + con_depth,0])
     rotate([0, 0, -90])
     female_clasp_and_mount();
 
