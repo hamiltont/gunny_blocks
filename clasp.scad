@@ -1,6 +1,6 @@
 // clasp(length = 10);
 // Need a sample pin?
-// color("blue") cylinder(r=5, h=12);
+//color("blue") clasp_pin(radius = 5, height = 12);
 
 module clasp(length=20, 
              pin_radius=5,
@@ -21,6 +21,9 @@ module clasp(length=20,
   echo(str("  Mouth : ", mouth));
   echo(str("  PinRad: ", pin_radius));
 
+  // Build clasp, lay horizontally, and reorient z-axis to zero
+  translate([0, 0, outer_radius])
+  rotate([0, 90, 0]) 
   difference() {
     cylinder(r=outer_radius,h=length);
    
@@ -41,12 +44,16 @@ module clasp(length=20,
 
     size = length + 2;
     if (angle_deg <= 90) {
+      // Rotate so our cut always faces +Y
+      rotate([0, 0, 90 - angle_deg/2])
       translate([0,0,-1]) 
       intersection() {
         cube(size);
         rotate(angle_deg-90) cube(size);
       }
     } else if (angle_deg <= 180) {
+      // Rotate so our cut always faces +Y
+      rotate([0, 0, 90 - angle_deg/2])
       translate([0,0,-1]) 
       union() {
         cube(size);
@@ -57,6 +64,19 @@ module clasp(length=20,
     } 
   }
 
+}
+
+
+module clasp_pin(radius, length) {
+    // You can rotate it to get a better print angle, but you 
+    //   will need 8xSupports while printing
+    //   which is tedious to clean
+    // rotate(a=45, v=[1,0,0])
+
+    // Lay pins horizontally & reorient z-axis to zero
+    translate([0,0,radius])
+    rotate([0, 90, 0]) 
+    cylinder(r=radius, h=length);
 }
 
 /*
