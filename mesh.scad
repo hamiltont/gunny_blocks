@@ -10,16 +10,20 @@ module mesh(side_length,
             hole_diameter = undef, 
             height=3,
             border=undef,
+            border_height=undef,
             grid_spacing=0.2) {
              
   hole_diameter = is_undef(hole_diameter) ? side_length / 8 : hole_diameter;
   border = is_undef(border) ? side_length *.1 : border;
+  border_height = is_undef(border_height) ? height : border_height;
+
               
   echo(str("Building mesh with: "));
   echo(str("  Side: ", side_length));
   echo(str("  Hole Diameter: ", hole_diameter));
   echo(str("  Height: ", height));
   echo(str("  Border : ", border));
+  echo(str("  Border Height : ", border_height));
   echo(str("  Grid Spacing: ", grid_spacing));
 
   // Ensure the border is sane
@@ -40,17 +44,20 @@ module mesh(side_length,
   */
 
   union(){
+    // Build the four border walls
     color("gray") {
-      cube([size,border,height]);
-      cube([border,size,height]);
+      cube([size,border,border_height]);
+      cube([border,size,border_height]);
      
       translate([size-border,0,0]) 
-      cube([border,size,height]);
+      cube([border,size,border_height]);
      
       translate([0,size-border,0]) 
-      cube([size,border,height]);
+      cube([size,border,border_height]);
     }
 
+    // Lay out the mesh and cut the circles
+    // TODO Do we want mesh to be in middle of border_height? Makes printing harder
     difference() {
       translate([border, border, 0])
         cube(size=[size - 2*border, size - 2*border, height]);

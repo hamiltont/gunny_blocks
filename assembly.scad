@@ -18,13 +18,14 @@ if (mode == 1) {
   mesh_hole_diameter = 18;
   mesh_border = 1;
   mesh_grid_spacing = 1;
+  mesh_border_height = 4;
 // === End =======================
 
 // === Connector Variables ============
 // These define the bounding box used by both
 // the clasp pin and the clasp
   con_width = mesh_size;
-  con_height = mesh_height;
+  con_height = mesh_border_height;
   con_depth = 5;
 // === End =======================
 
@@ -52,6 +53,7 @@ module mesh_with_clasps_and_pins() {
         hole_diameter = mesh_hole_diameter,
         height = mesh_height,
         border = mesh_border, 
+        border_height = mesh_border_height,
         grid_spacing = mesh_grid_spacing / 10);
   
   // Create male sides
@@ -78,7 +80,7 @@ module mesh_with_clasps_and_pins() {
     translate([1.5, clasp_outer_rad + clasp_mount_depth,0])
     union() {
       // Shift clasp down to ease alignment
-      translate([0,0,(mesh_height / 2) - clasp_outer_rad]) 
+      translate([0,0,(mesh_border_height / 2) - clasp_outer_rad]) 
         clasp(length = clasp_len, 
               pin_radius = cp_rad,
               mouth = clasp_mouth,
@@ -96,7 +98,7 @@ module mesh_with_clasps_and_pins() {
     // color("green") cube([con_width, con_depth, con_height]);  
     // Assume mounts are each 1mm wide
     // Assume we want the CP 2.5mm deep
-    pin_mount_height = (mesh_height / 2) - cp_rad;
+    pin_mount_height = (mesh_border_height / 2) - cp_rad;
     union() {
       cube([1, con_depth, con_height]);
       translate([0, 2.5, pin_mount_height])
