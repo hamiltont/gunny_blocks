@@ -13,10 +13,10 @@ if (mode == 1) {
 }
 
 // === Mesh Variables ============
-  mesh_size = 50;
+  mesh_size = 20;
   mesh_height = 3;
-  mesh_hole_diameter = 10;
-  mesh_border = 6;
+  mesh_hole_diameter = 18;
+  mesh_border = 1;
   mesh_grid_spacing = 1;
 // === End =======================
 
