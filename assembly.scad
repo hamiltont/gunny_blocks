@@ -10,13 +10,15 @@ $fn=10;
   mesh_size = 180;
   // Z height of the mesh part where the holes go
   mesh_height = 1;
-  // Size of each hole in the mesh
+  // Size of each hole in the mesh. Smaller sizes increase rendering time as there 
+  // will be many more circles to calculate 
   mesh_hole_diameter = 15;
   // Depth (in XY) of the border around the mesh itself. Needed to support the mesh 
   mesh_border = 2.5;
   // Z height of the border. Can be equal to mesh height or the connector height
   mesh_border_height = 10;
-  // How close the mesh circles are to each other
+  // How close the mesh circles are to each other. Larger spacing reduces rendering
+  // time but increases filament usage and print time
   mesh_grid_spacing = 3; // [1:10]
 // === End =======================
 
