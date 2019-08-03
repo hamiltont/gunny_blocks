@@ -13,33 +13,33 @@ if (mode == 1) {
 }
 
 // === Mesh Variables ============
-  mesh_size = 20;
-  mesh_height = 3;
-  mesh_hole_diameter = 18;
-  mesh_border = 1;
-  mesh_grid_spacing = 1;
-  mesh_border_height = 4;
+  mesh_size = 180;
+  mesh_height = 1; // 3.5
+  mesh_hole_diameter = 15;
+  mesh_border = 2.5;
+  mesh_border_height = 10;
+  mesh_grid_spacing = 3;
 // === End =======================
 
 // === Connector Variables ============
 // These define the bounding box used by both
 // the clasp pin and the clasp
   con_width = mesh_size;
-  con_height = mesh_border_height;
-  con_depth = 5;
+  con_height = mesh_border_height; 
+  con_depth = con_height; // Keep con square so corners interlock OK
 // === End =======================
 
 // === Clasp Pin Variables ============
   cp_length = con_width;
-  cp_rad = 1;
+  cp_rad = 2.5;
   // TODO define cp_mount_width = 1;
 // === End =======================
 
 // === Clasp Variables ============
   clasp_len = con_width - 3;
-  clasp_mouth = cp_rad * 2.2;
-  clasp_inner_rad = cp_rad + 0.15;
-  clasp_outer_rad = clasp_inner_rad * 1.4; // 2.45; //clasp_inner_rad*1.4;
+  clasp_mouth = cp_rad * 1.65;
+  clasp_inner_rad = cp_rad + 0.65;
+  clasp_outer_rad = clasp_inner_rad * 1.25;
 // === End =======================
 
 include <mesh.scad>
@@ -74,13 +74,22 @@ module mesh_with_clasps_and_pins() {
     // Helper variables
     clasp_thickness = clasp_outer_rad - clasp_inner_rad;
     clasp_mount_depth = con_depth - clasp_outer_rad*2; // Does not incl. thickness
+    // Fudge factor, we need to keep the clasp within the 
+    // bounding box or our 3D arrangement won't work right. However, we also
+    // need it to be roughly aligned with the pin or the 3D arrangement will 
+    // be hard to assemble. Calculating directly is tough, as the bigger the
+    // mouth cut is, the more of a fudge factor we need. So we approx an OK val
+    clasp_extra_mount_depth = clasp_mouth / 3.6; 
 
     // Assume we need to reserve 3mm (total) in X-axis the clasp mounts
     // Realign Y-axix to zero 
     translate([1.5, clasp_outer_rad + clasp_mount_depth,0])
     union() {
+
       // Shift clasp down to ease alignment
-      translate([0,0,(mesh_border_height / 2) - clasp_outer_rad]) 
+      translate([0,
+                 clasp_extra_mount_depth, 
+                 (mesh_border_height / 2) - clasp_outer_rad]) 
         clasp(length = clasp_len, 
               pin_radius = cp_rad,
               mouth = clasp_mouth,
@@ -88,7 +97,13 @@ module mesh_with_clasps_and_pins() {
               outer_radius=clasp_outer_rad);
       // Build + align clasp mount
       translate([0, -clasp_outer_rad-clasp_mount_depth, 0])
-        cube([con_width - 3, clasp_mount_depth + clasp_thickness, con_height]);
+        cube([con_width - 3, 
+              clasp_mount_depth + clasp_thickness + clasp_extra_mount_depth,
+              con_height]);
+      
+      // Debug (for ensuring the bounding box is right)
+      // translate([0, -clasp_outer_rad-clasp_mount_depth, 0])
+      // cube([1, con_depth, con_height]);
      }
  }
 
