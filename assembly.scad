@@ -1,6 +1,73 @@
 
-$fn=10; 
+/* [Core] */
+// Number of segments in a circle. Affects all circles - mesh, pins, clasps, etc
+$fn=10;
 
+// === Mesh Variables ============
+/* [Mesh] */
+  // XY for the mesh only. Pins and clasp will be placed outside this size
+  // so ensure your printer bed can handle "mesh_size + con_depth"
+  mesh_size = 180;
+  // Z height of the mesh part where the holes go
+  mesh_height = 1;
+  // Size of each hole in the mesh
+  mesh_hole_diameter = 15;
+  // Depth (in XY) of the border around the mesh itself. Needed to support the mesh 
+  mesh_border = 2.5;
+  // Z height of the border. Can be equal to mesh height or the connector height
+  mesh_border_height = 10;
+  // How close the mesh circles are to each other
+  mesh_grid_spacing = 3; // [1:10]
+// === End =======================
+
+// === Connector Variables ============
+// These define the bounding box used by both
+// the clasp pin and the clasp
+/* [Connector Shared Variables For Clasp And Pin] */
+  // Width each connector gets. We currently have one connector per side so 
+  // we use the full width of the mesh
+  con_width = mesh_size;
+  // Height each connector gets. Printing connectors seems to be easier if they are 
+  // bigger, so we set them to be as tall as the mesh border to get maximum height
+  con_height = mesh_border_height; 
+  // Depth each connector gets. Keeping the connectors in a square bounding box 
+  // ensures 3D assemblies work OK. If you make it non-square then one of your 
+  // resulting axis will end up longer when assembling multiple sides together   
+  con_depth = con_height; 
+// === End =======================
+
+// === Clasp Pin Variables ============
+/* [Pin] */
+  // Length of the clasp pin
+  cp_length = con_width;
+  // Radius of the pin. Larger values print smoother but require larger mesh border
+  // height. Also, the clasp (the female half) will grow larger and may be taller 
+  // than the mesh border height. If this happens, it is probably time to stop using 
+  // Customizer and use OpenSCAD directly where you can see/edit many more variables
+  cp_rad = 2.5;
+  // TODO define cp_mount_width = 1;
+// === End =======================
+
+// === Clasp Variables ============
+/* [Clasp] */
+  // Lenght of the clasp. We remove a bit so there is an empty space matching up to 
+  // the pin mounts
+  clasp_len = con_width - 3;
+  // Amount of the gap we will cut out of the clasp circumference. 2 * the radius would
+  // allow the pin to fall out without obstruction, so we go a bit lower than taht
+  clasp_mouth = cp_rad * 1.65;
+  // Inner radius of the clasp. We add a small buffer due to printing defects. Remember
+  // the pin should rotate freely in the clasp
+  clasp_inner_rad = cp_rad + 0.65;
+  // The outer radius. This effectively describes the 'thickness' of the clasp. Thicker
+  // values are much harder to bend, while values too small make a weak clasp that cracks. 
+  // Note that there is no safety check that the clasp_outer_rad will fit within the 
+  // connector's bounding box, so you need to manually look at the Z-axis when making a 
+  // thick clasp and ensure you're not making it so large it will not print properly
+  clasp_outer_rad = clasp_inner_rad * 1.25;
+// === End =======================
+
+/* [Hidden] */
 // Overall mode
 // 1 - Generate one side (mesh with clasps & pins)
 // 2 - Testing code
@@ -11,36 +78,6 @@ if (mode == 1) {
 } else if (mode == 2) {
   test();
 }
-
-// === Mesh Variables ============
-  mesh_size = 180;
-  mesh_height = 1; // 3.5
-  mesh_hole_diameter = 15;
-  mesh_border = 2.5;
-  mesh_border_height = 10;
-  mesh_grid_spacing = 3;
-// === End =======================
-
-// === Connector Variables ============
-// These define the bounding box used by both
-// the clasp pin and the clasp
-  con_width = mesh_size;
-  con_height = mesh_border_height; 
-  con_depth = con_height; // Keep con square so corners interlock OK
-// === End =======================
-
-// === Clasp Pin Variables ============
-  cp_length = con_width;
-  cp_rad = 2.5;
-  // TODO define cp_mount_width = 1;
-// === End =======================
-
-// === Clasp Variables ============
-  clasp_len = con_width - 3;
-  clasp_mouth = cp_rad * 1.65;
-  clasp_inner_rad = cp_rad + 0.65;
-  clasp_outer_rad = clasp_inner_rad * 1.25;
-// === End =======================
 
 include <mesh.scad>
 include <clasp.scad>
